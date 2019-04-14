@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect
 from database import db_session, init_db
 from models.restaurants import Restaurants
+from models.histories import Histories
+from random import choice
 import datetime
 
 app = Flask(__name__)
@@ -18,7 +20,8 @@ def shutdown_session(exception=None):
 
 @app.route('/')
 def start():
-    return 'Hello World!'
+    now = datetime.datetime.now()
+    return render_template('start.html', now=now)
 
 
 @app.route('/create-restaurant', methods=['GET', 'POST'])
@@ -33,7 +36,7 @@ def create_restaurant():
                                  site_url=site_url)
         db_session.add(restaurant)
         db_session.commit()
-        return '{} {} {}'.format(name, description, site_url)
+        return redirect('/restaurants')
 
     return render_template('create_restaurant.html')
 
@@ -77,6 +80,43 @@ def delete_restaurant():
         db_session.delete(restaurant)
         db_session.commit()
     return redirect('/restaurants')
+
+
+@app.route('/draw')
+def draw():
+    restaurants = Restaurants.query.all()
+
+    if not restaurants:
+        return redirect('/create-restaurant')
+
+    random_restaurant = choice(restaurants)
+
+    try:
+        restaurant = Restaurants.query.get(random_restaurant.id)
+        restaurant.draw += 1
+
+        history = Histories(restaurant_id=restaurant.id)
+        db_session.add(history)
+        db_session.commit()
+    except Exception:
+        db_session.rollback()
+        return redirect('/')
+
+    now = datetime.datetime.now()
+
+    return render_template('draw.html', restaurant=restaurant, now=now)
+
+
+def mealformat(value):
+    if value.hour in [4, 5, 6, 7, 8, 9]:
+        return 'Breakfast'
+    elif value.hour in [10, 11, 12, 13, 14, 15]:
+        return 'Lunch'
+    else:
+        return 'Dinner'
+
+
+app.jinja_env.filters['meal'] = mealformat
 
 
 if __name__ == '__main__':
