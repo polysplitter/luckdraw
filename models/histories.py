@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from sqlalchemy import Column, String, DateTime, ForeignKey
 from database import Base
 import uuid

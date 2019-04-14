@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from sqlalchemy import Column, Integer, String, DateTime
 from database import Base
 from sqlalchemy.orm import relationship

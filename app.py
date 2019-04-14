@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from flask import Flask, render_template, request, redirect
 from database import db_session, init_db
 from sqlalchemy import desc
@@ -142,4 +144,6 @@ app.jinja_env.filters['datetime'] = datetimeformat
 
 if __name__ == '__main__':
     app.jinja_env.auto_reload = True
+    # this line is required for docker to know how to host it.
+    app.run(host='0.0.0.0')
     app.run(debug=True)
