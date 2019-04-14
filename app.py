@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect
 from database import db_session, init_db
+from sqlalchemy import desc
 from models.restaurants import Restaurants
 from models.histories import Histories
 from random import choice
@@ -107,6 +108,21 @@ def draw():
     return render_template('draw.html', restaurant=restaurant, now=now)
 
 
+@app.route('/history')
+def history():
+    histories = Histories.query.order_by(
+        desc(Histories.created_time)).limit(20)
+
+    return render_template('history.html', histories=histories)
+
+
+@app.route('/top')
+def top():
+    restaurants = Restaurants.query.order_by(desc(Restaurants.draw)).limit(5)
+
+    return render_template('top.html', restaurants=restaurants)
+
+
 def mealformat(value):
     if value.hour in [4, 5, 6, 7, 8, 9]:
         return 'Breakfast'
@@ -116,7 +132,12 @@ def mealformat(value):
         return 'Dinner'
 
 
+def datetimeformat(value):
+    return value.strftime('%Y-%m-%d %H:%M:%S')
+
+
 app.jinja_env.filters['meal'] = mealformat
+app.jinja_env.filters['datetime'] = datetimeformat
 
 
 if __name__ == '__main__':
