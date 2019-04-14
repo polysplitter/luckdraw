@@ -145,5 +145,5 @@ app.jinja_env.filters['datetime'] = datetimeformat
 if __name__ == '__main__':
     app.jinja_env.auto_reload = True
     # this line is required for docker to know how to host it.
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port='5050')
     app.run(debug=True)
