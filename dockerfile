@@ -20,4 +20,4 @@ ENTRYPOINT [ "python" ]
 CMD [ "app.py" ]
 
 # docker build -t luckdraw:latest .
-# docker run -d -p 5010:5010 luckdraw
+# docker run -d --name luck -p 5010:5010 luckdraw
